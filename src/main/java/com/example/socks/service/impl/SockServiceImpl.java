@@ -28,6 +28,7 @@ public class SockServiceImpl implements SockService {
 
     @Override
     public String income(CreateSockRequest request) {
+        request.validate();
         Optional<Sock> existingSock = repository.findByColorAndCottonPart(request.getColor(), request.getCottonPart());
         return existingSock.map(sock -> updateExistingSock(sock, request.getQuantity()))
                 .orElseGet(() -> createNewSock(request));
@@ -44,6 +45,7 @@ public class SockServiceImpl implements SockService {
     }
 
     private String createNewSock(CreateSockRequest request) {
+        request.validate();
         Sock newSock = Sock.builder()
                 .color(request.getColor())
                 .cottonPart(request.getCottonPart())
@@ -59,6 +61,7 @@ public class SockServiceImpl implements SockService {
 
     @Override
     public ResponseEntity<String> outcome(CreateSockRequest request) {
+        request.validate();
         Optional<Sock> existingSock = repository.findByColorAndCottonPart(request.getColor(), request.getCottonPart());
         return existingSock.isPresent() ? processSockOutcome(existingSock.get(), request.getQuantity())
                 : createNotFoundResponse(request);

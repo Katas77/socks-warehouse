@@ -30,7 +30,7 @@ public class SockController {
             @ApiResponse(responseCode = "500", description = "Ошибка сервера.")
     })
     @PostMapping("/income")
-    public ResponseEntity<String> income(@Valid @RequestBody CreateSockRequest request) {
+    public ResponseEntity<String> income( @RequestBody CreateSockRequest request) {
         return ResponseEntity.ok(sockService.income(request));
     }
 

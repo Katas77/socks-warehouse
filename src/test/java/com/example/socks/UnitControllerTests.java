@@ -137,7 +137,7 @@ public class UnitControllerTests {
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("Партии носков успешно обработаны.", result.getBody());
-        Mockito.verify(repository, Mockito.times(2)).save(any(Sock.class));
+        Mockito.verify(repository, Mockito.times(1)).save(any(Sock.class));
     }
 
     @Test
