@@ -18,10 +18,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +60,6 @@ public class SockServiceImpl implements SockService {
     @Override
     public ResponseEntity<String> outcome(CreateSockRequest request) {
         Optional<Sock> existingSock = repository.findByColorAndCottonPart(request.getColor(), request.getCottonPart());
-
         return existingSock.isPresent() ? processSockOutcome(existingSock.get(), request.getQuantity())
                 : createNotFoundResponse(request);
     }
@@ -114,7 +110,11 @@ public class SockServiceImpl implements SockService {
     public ResponseEntity<String> uploadSocksBatch(MultipartFile file) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String line;
+            int lineCounter = 0;
             while ((line = reader.readLine()) != null) {
+                if (lineCounter++ == 0) {
+                    continue;
+                }
                 processSockData(line);
             }
         } catch (IOException e) {
@@ -137,6 +137,18 @@ public class SockServiceImpl implements SockService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         });
     }
+
+        @Override
+        public List<Sock> filterSocks(int minCottonPart, int maxCottonPart, String sortBy) {
+            List<Sock> socks = repository.findByCottonPartBetween(minCottonPart, maxCottonPart);
+            if ("color".equalsIgnoreCase(sortBy)) {
+                socks.sort(Comparator.comparing(Sock::getColor));
+            } else if ("cottonPart".equalsIgnoreCase(sortBy)) {
+                socks.sort(Comparator.comparingInt(Sock::getCottonPart));
+            }
+            return socks;
+        }
+
 
     private void processSockData(String line) {
         try {

@@ -1,10 +1,12 @@
 package com.example.socks.controller;
 
 import com.example.socks.dto.CreateSockRequest;
+import com.example.socks.model.Sock;
 import com.example.socks.service.SockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/socks")
@@ -27,7 +30,7 @@ public class SockController {
             @ApiResponse(responseCode = "500", description = "Ошибка сервера.")
     })
     @PostMapping("/income")
-    public ResponseEntity<String> income(@RequestBody CreateSockRequest request) {
+    public ResponseEntity<String> income(@Valid @RequestBody CreateSockRequest request) {
         return ResponseEntity.ok(sockService.income(request));
     }
 
@@ -39,7 +42,6 @@ public class SockController {
     })
     @PostMapping("/outcome")
     public ResponseEntity<String> outcome(@RequestBody CreateSockRequest request) {
-
         return sockService.outcome(request);
     }
 
@@ -74,8 +76,27 @@ public class SockController {
             @ApiResponse(responseCode = "404", description = "Носки не найдены."),
             @ApiResponse(responseCode = "400", description = "Некорректные данные запроса.")
     })
+
     @PutMapping("/{id}")
     public ResponseEntity<String> updateSock(@PathVariable Long id, @RequestBody CreateSockRequest request) {
         return sockService.updateSock(id, request);
     }
+    @Operation(summary = "Фильтрация носков", description = "Позволяет фильтровать носки по проценту хлопка и сортировать результат.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Носки успешно отфильтрованы."),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные запроса."),
+            @ApiResponse(responseCode = "404", description = "Носки не найдены.")
+    })
+    @GetMapping("/filter")
+    public ResponseEntity<List<Sock>> filterSocks(
+            @RequestParam int minCottonPart,
+            @RequestParam int maxCottonPart,
+            @RequestParam(required = false, defaultValue = "color") String sortBy) {
+        return ResponseEntity.ok(sockService.filterSocks(minCottonPart, maxCottonPart, sortBy));
+    }
+   /* required = false:
+    Этот параметр означает, что наличие параметра "sortBy" в запросе необязательно. Если он отсутствует, метод всё равно выполнится, и значение переменной sortBy будет установлено по умолчанию.
+            defaultValue = "color":
+    Указывает, какое значение переменная sortBy должна принимать, если параметр в запросе не передан. В данном случае, если параметр "sortBy" отсутствует, то переменная sortBy получит значение "color".
+*/
 }
