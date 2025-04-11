@@ -1,3 +1,4 @@
+
 package com.example.socks.controller;
 
 import com.example.socks.dto.CreateSockRequest;
@@ -6,13 +7,11 @@ import com.example.socks.service.SockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -94,9 +93,8 @@ public class SockController {
             @RequestParam(required = false, defaultValue = "color") String sortBy) {
         return ResponseEntity.ok(sockService.filterSocks(minCottonPart, maxCottonPart, sortBy));
     }
-   /* required = false:
-    Этот параметр означает, что наличие параметра "sortBy" в запросе необязательно. Если он отсутствует, метод всё равно выполнится, и значение переменной sortBy будет установлено по умолчанию.
-            defaultValue = "color":
-    Указывает, какое значение переменная sortBy должна принимать, если параметр в запросе не передан. В данном случае, если параметр "sortBy" отсутствует, то переменная sortBy получит значение "color".
-*/
 }
+
+
+
+

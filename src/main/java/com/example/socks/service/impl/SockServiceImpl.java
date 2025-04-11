@@ -4,7 +4,6 @@ import com.example.socks.dto.CreateSockRequest;
 import com.example.socks.model.Sock;
 import com.example.socks.repository.SockRepository;
 import com.example.socks.service.SockService;
-
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -45,7 +43,6 @@ public class SockServiceImpl implements SockService {
     }
 
     private String createNewSock(CreateSockRequest request) {
-        request.validate();
         Sock newSock = Sock.builder()
                 .color(request.getColor())
                 .cottonPart(request.getCottonPart())

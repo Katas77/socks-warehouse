@@ -5,6 +5,7 @@ import com.example.socks.model.Sock;
 import com.example.socks.repository.SockRepository;
 
 import com.example.socks.service.impl.SockServiceImpl;
+import com.example.socks.validator.SockRequestValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -14,8 +15,11 @@ import org.springframework.mock.web.MockMultipartFile;
 
 
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UnitControllerTests {
     private SockRepository repository;
@@ -23,7 +27,7 @@ public class UnitControllerTests {
 
     @BeforeEach
     void setup() {
-        repository = Mockito.mock(SockRepository.class);
+        repository = mock(SockRepository.class);
         sockService = new SockServiceImpl(repository);
     }
 
@@ -37,7 +41,7 @@ public class UnitControllerTests {
                 .build();
         Sock existingSock = Sock.builder().color("синий").cottonPart(25).quantity(50).build();
 
-        Mockito.when(repository.findByColorAndCottonPart("синий", 25)).thenReturn(Optional.of(existingSock));
+        when(repository.findByColorAndCottonPart("синий", 25)).thenReturn(Optional.of(existingSock));
 
         String result = sockService.income(request);
         assertEquals("Носки с цветом синий и содержанием хлопка 25% были успешно обновлены.", result);
@@ -53,7 +57,7 @@ public class UnitControllerTests {
                 .quantity(200)
                 .build();
 
-        Mockito.when(repository.findByColorAndCottonPart("зеленый", 50)).thenReturn(Optional.empty());
+        when(repository.findByColorAndCottonPart("зеленый", 50)).thenReturn(Optional.empty());
         String result = sockService.income(request);
         assertEquals("Добавлена новая партия носков с цветом зеленый и содержанием хлопка 50%.", result);
         Mockito.verify(repository).save(any(Sock.class));
@@ -68,7 +72,7 @@ public class UnitControllerTests {
                 .build();
         Sock existingSock = Sock.builder().color("красный").cottonPart(30).quantity(100).build();
 
-        Mockito.when(repository.findByColorAndCottonPart("красный", 30)).thenReturn(Optional.of(existingSock));
+        when(repository.findByColorAndCottonPart("красный", 30)).thenReturn(Optional.of(existingSock));
 
 
         ResponseEntity<String> result = sockService.outcome(request);
@@ -87,7 +91,7 @@ public class UnitControllerTests {
                 .build();
         Sock existingSock = Sock.builder().color("красный").cottonPart(30).quantity(100).build();
 
-        Mockito.when(repository.findByColorAndCottonPart("красный", 30)).thenReturn(Optional.of(existingSock));
+        when(repository.findByColorAndCottonPart("красный", 30)).thenReturn(Optional.of(existingSock));
 
         ResponseEntity<String> result = sockService.outcome(request);
 
@@ -104,7 +108,7 @@ public class UnitControllerTests {
                 .quantity(10)
                 .build();
 
-        Mockito.when(repository.findByColorAndCottonPart("желтый", 20)).thenReturn(Optional.empty());
+        when(repository.findByColorAndCottonPart("желтый", 20)).thenReturn(Optional.empty());
 
 
         ResponseEntity<String> result = sockService.outcome(request);
@@ -117,7 +121,7 @@ public class UnitControllerTests {
     @Test
     void testGetSockCountByFilter() {
 
-        Mockito.when(repository.countSocksByFilter("синий", "greater", 10)).thenReturn(15);
+        when(repository.countSocksByFilter("синий", "greater", 10)).thenReturn(15);
 
 
         Integer count = sockService.getSockCountByFilter("синий", "greater", 10);
@@ -151,7 +155,7 @@ public class UnitControllerTests {
                 .build();
         Sock existingSock = Sock.builder().id(sockId).color("красный").cottonPart(30).quantity(100).build();
 
-        Mockito.when(repository.findById(sockId)).thenReturn(Optional.of(existingSock));
+        when(repository.findById(sockId)).thenReturn(Optional.of(existingSock));
 
         ResponseEntity<String> result = sockService.updateSock(sockId, request);
 
@@ -167,12 +171,44 @@ public class UnitControllerTests {
         Long sockId = 2L;
         CreateSockRequest request = CreateSockRequest.builder().color("синий").cottonPart(25).quantity(100).build();
 
-        Mockito.when(repository.findById(sockId)).thenReturn(Optional.empty());
+        when(repository.findById(sockId)).thenReturn(Optional.empty());
 
         ResponseEntity<String> result = sockService.updateSock(sockId, request);
 
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
         assertEquals("Носки с id 2 не найдены.", result.getBody());
     }
+    @Test
+    void testValidationScenarios() {
+       final SockRequestValidator validator = new SockRequestValidator();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            validator.validate(null);
+        }, "Запрос не может быть null");
+
+
+        CreateSockRequest requestNegativeCotton = new CreateSockRequest("красный",-1, 10);
+        assertThrows(IllegalArgumentException.class, () -> {
+            validator.validate(requestNegativeCotton);
+        }, "Процентное содержание хлопка должно быть от 0 до 100");
+
+
+        CreateSockRequest requestExceedsCotton = new CreateSockRequest("красный",101, 10);
+        assertThrows(IllegalArgumentException.class, () -> {
+            validator.validate(requestExceedsCotton);
+        }, "Процентное содержание хлопка должно быть от 0 до 100");
+
+
+        CreateSockRequest requestNegativeQuantity = new CreateSockRequest("красный",50, -1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            validator.validate(requestNegativeQuantity);
+        }, "Количество носков для заказа должно быть неотрицательным");
+
+        CreateSockRequest validRequest = new CreateSockRequest("красный",50, 10);
+        assertDoesNotThrow(() -> {
+            validator.validate(validRequest);
+        });
+    }
+
 
 }
