@@ -2,7 +2,7 @@ package com.example.socks.validator;
 
 import com.example.socks.dto.CreateSockRequest;
 
-public class SockRequestValidator {
+public class RequestValidator {
 
     public void validate(CreateSockRequest request) {
         if (request == null) {

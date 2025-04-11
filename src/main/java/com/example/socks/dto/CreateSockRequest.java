@@ -1,6 +1,6 @@
 package com.example.socks.dto;
 
-import com.example.socks.validator.SockRequestValidator;
+import com.example.socks.validator.RequestValidator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +24,6 @@ public class CreateSockRequest {
             example = "3")
     private int quantity;
     public void validate() {
-        new SockRequestValidator().validate(this);
+        new RequestValidator().validate(this);
     }
 }

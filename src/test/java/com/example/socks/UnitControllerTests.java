@@ -5,7 +5,7 @@ import com.example.socks.model.Sock;
 import com.example.socks.repository.SockRepository;
 
 import com.example.socks.service.impl.SockServiceImpl;
-import com.example.socks.validator.SockRequestValidator;
+import com.example.socks.validator.RequestValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -180,7 +180,7 @@ public class UnitControllerTests {
     }
     @Test
     void testValidationScenarios() {
-       final SockRequestValidator validator = new SockRequestValidator();
+       final RequestValidator validator = new RequestValidator();
 
         assertThrows(IllegalArgumentException.class, () -> {
             validator.validate(null);
