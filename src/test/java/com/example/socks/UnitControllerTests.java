@@ -83,7 +83,7 @@ public class UnitControllerTests {
 
     @Test
     void testOutcome_SockExistsButInsufficientQuantity() {
-        // Arrange
+
         CreateSockRequest request = CreateSockRequest.builder()
                 .color("красный")
                 .cottonPart(30)
@@ -101,7 +101,6 @@ public class UnitControllerTests {
 
     @Test
     void testOutcome_SockNotFound() {
-        // Arrange
         CreateSockRequest request = CreateSockRequest.builder()
                 .color("желтый")
                 .cottonPart(20)
@@ -120,25 +119,17 @@ public class UnitControllerTests {
 
     @Test
     void testGetSockCountByFilter() {
-
         when(repository.countSocksByFilter("синий", "greater", 10)).thenReturn(15);
-
-
         Integer count = sockService.getSockCountByFilter("синий", "greater", 10);
-
         assertEquals(15, count);
         Mockito.verify(repository).countSocksByFilter("синий", "greater", 10);
     }
 
     @Test
     void testUploadSocksBatch_Success() throws Exception {
-
         String content = "синий,25,100\nзеленый,50,200";
         MockMultipartFile file = new MockMultipartFile("file", "socks.csv", "text/csv", content.getBytes());
-
-
         ResponseEntity<String> result = sockService.uploadSocksBatch(file);
-
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("Партии носков успешно обработаны.", result.getBody());
         Mockito.verify(repository, Mockito.times(1)).save(any(Sock.class));
@@ -154,11 +145,8 @@ public class UnitControllerTests {
                 .quantity(75)
                 .build();
         Sock existingSock = Sock.builder().id(sockId).color("красный").cottonPart(30).quantity(100).build();
-
         when(repository.findById(sockId)).thenReturn(Optional.of(existingSock));
-
         ResponseEntity<String> result = sockService.updateSock(sockId, request);
-
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals("Параметры носков успешно обновлены.", result.getBody());
         assertEquals("синий", existingSock.getColor());
