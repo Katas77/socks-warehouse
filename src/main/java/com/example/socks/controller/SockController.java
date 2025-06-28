@@ -1,4 +1,3 @@
-
 package com.example.socks.controller;
 
 import com.example.socks.dto.CreateSockRequest;
@@ -9,9 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -29,8 +28,8 @@ public class SockController {
             @ApiResponse(responseCode = "500", description = "Ошибка сервера.")
     })
     @PostMapping("/income")
-    public ResponseEntity<String> income( @RequestBody CreateSockRequest request) {
-        return ResponseEntity.ok(sockService.income(request));
+    public String income(@RequestBody CreateSockRequest request) {
+        return sockService.income(request);
     }
 
     @Operation(summary = "Отгрузка носков", description = "Позволяет отгрузить указанное количество носков.")
@@ -40,7 +39,7 @@ public class SockController {
             @ApiResponse(responseCode = "400", description = "Недостаточное количество носков для отгрузки.")
     })
     @PostMapping("/outcome")
-    public ResponseEntity<String> outcome(@RequestBody CreateSockRequest request) {
+    public String outcome(@RequestBody CreateSockRequest request) {
         return sockService.outcome(request);
     }
 
@@ -51,11 +50,10 @@ public class SockController {
             @ApiResponse(responseCode = "500", description = "Ошибка сервера.")
     })
     @GetMapping("")
-    public ResponseEntity<Integer> getSockCount(@RequestParam(required = false) String color,
+    public Integer getSockCount(@RequestParam(required = false) String color,
                                                 @RequestParam(required = false) String comparison,
                                                 @RequestParam(required = false) Integer cottonPart) {
-        Integer count = sockService.getSockCountByFilter(color, comparison, cottonPart);
-        return ResponseEntity.ok(count);
+        return sockService.getSockCountByFilter(color, comparison, cottonPart);
     }
 
     @Operation(summary = "Загрузка партии носков", description = "Позволяет загрузить партию носков из CSV файла.")
@@ -65,7 +63,7 @@ public class SockController {
             @ApiResponse(responseCode = "500", description = "Ошибка сервера.")
     })
     @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadSocksBatch(@RequestParam("file") MultipartFile file) throws IOException {
+    public String uploadSocksBatch(@RequestParam("file") MultipartFile file) throws IOException {
         return sockService.uploadSocksBatch(file);
     }
 
@@ -77,9 +75,10 @@ public class SockController {
     })
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateSock(@PathVariable Long id, @RequestBody CreateSockRequest request) {
+    public String updateSock(@PathVariable Long id, @RequestBody CreateSockRequest request) {
         return sockService.updateSock(id, request);
     }
+
     @Operation(summary = "Фильтрация носков", description = "Позволяет фильтровать носки по проценту хлопка и сортировать результат.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Носки успешно отфильтрованы."),
@@ -87,11 +86,11 @@ public class SockController {
             @ApiResponse(responseCode = "404", description = "Носки не найдены.")
     })
     @GetMapping("/filter")
-    public ResponseEntity<List<Sock>> filterSocks(
+    public List<Sock> filterSocks(
             @RequestParam int minCottonPart,
             @RequestParam int maxCottonPart,
             @RequestParam(required = false, defaultValue = "color") String sortBy) {
-        return ResponseEntity.ok(sockService.filterSocks(minCottonPart, maxCottonPart, sortBy));
+        return sockService.filterSocks(minCottonPart, maxCottonPart, sortBy);
     }
 }
 

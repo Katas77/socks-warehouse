@@ -17,12 +17,13 @@ public class CreateSockRequest {
     @Schema(description = "Цвет носков",
             example = "синий")
     private String color;
-   @Schema(description = "Процентное содержание хлопка в носках (от 0 до 100)",
+    @Schema(description = "Процентное содержание хлопка в носках (от 0 до 100)",
             example = "80")
     private int cottonPart;
-   @Schema(description = "Количество носков для заказа (Количество носков для заказа должно быть неотрицательным)",
+    @Schema(description = "Количество носков для заказа (Количество носков для заказа должно быть неотрицательным)",
             example = "3")
     private int quantity;
+
     public void validate() {
         new RequestValidator().validate(this);
     }

@@ -1,4 +1,3 @@
-
 package com.example.socks;
 
 import com.example.socks.controller.SockController;
@@ -12,10 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -48,10 +47,8 @@ class SockControllerTests {
                 .build();
 
         Mockito.when(serviceMock.income(Mockito.any(CreateSockRequest.class))).thenReturn("The sock batch was successfully added or updated.");
-
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(request);
-        CreateSockRequest createSockRequest = objectMapper.readValue(jsonContent, CreateSockRequest.class);
         String expectedResponse = "The sock batch was successfully added or updated.";
 
         MvcResult result = mockMvc.perform(post(API_URL + "/income")
@@ -61,12 +58,11 @@ class SockControllerTests {
                 .andReturn();
 
         log.info("Income HTTP response status: {}", result.getResponse().getStatus());
-
         String actualResponse = result.getResponse().getContentAsString();
-
         Mockito.verify(serviceMock).income(Mockito.any(CreateSockRequest.class));
         assertEquals(expectedResponse, actualResponse);
     }
+
     @DisplayName("Test successful outcome operation")
     @Test
     void outcomeTest() throws Exception {
@@ -77,7 +73,7 @@ class SockControllerTests {
                 .build();
 
         Mockito.when(serviceMock.outcome(Mockito.any(CreateSockRequest.class)))
-                .thenReturn(ResponseEntity.ok("Socks have been shipped successfully."));
+                .thenReturn("Socks have been shipped successfully.");
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(request);
@@ -88,7 +84,6 @@ class SockControllerTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-
         log.info("Outcome HTTP response status: {}", result.getResponse().getStatus());
 
         String actualResponse = result.getResponse().getContentAsString();
@@ -124,7 +119,7 @@ class SockControllerTests {
     void uploadSocksBatchTest() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "socks.csv", MediaType.TEXT_PLAIN_VALUE, "color,cottonPart,quantity\nсиний,25,100".getBytes());
 
-        Mockito.when(serviceMock.uploadSocksBatch(file)).thenReturn(ResponseEntity.ok("The batch of socks has been successfully loaded"));
+        Mockito.when(serviceMock.uploadSocksBatch(file)).thenReturn("The batch of socks has been successfully loaded");
 
         MvcResult result = mockMvc.perform(multipart(API_URL + "/batch") // изменено с post на multipart
                         .file(file))
@@ -146,19 +141,15 @@ class SockControllerTests {
                 .cottonPart(40)
                 .quantity(80)
                 .build();
-
-        Mockito.when(serviceMock.updateSock(Mockito.eq(sockId), Mockito.any(CreateSockRequest.class))).thenReturn(ResponseEntity.ok("Sock parameters have been updated successfully."));
-
+        Mockito.when(serviceMock.updateSock(Mockito.eq(sockId), Mockito.any(CreateSockRequest.class))).thenReturn("Sock parameters have been updated successfully.");
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonContent = objectMapper.writeValueAsString(request);
         String expectedResponse = "Sock parameters have been updated successfully.";
-
         MvcResult result = mockMvc.perform(put(API_URL + "/" + sockId)
                         .content(jsonContent)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
-
         String actualResponse = result.getResponse().getContentAsString();
         log.info("Update sock HTTP response status: {}", result.getResponse().getStatus());
         assertEquals(expectedResponse, actualResponse);
