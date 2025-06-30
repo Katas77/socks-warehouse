@@ -58,6 +58,7 @@ public class SockServiceImpl implements SockService {
     }
 
     private String createNotFoundResponse(CreateSockRequest request) {
+        request.validate();
         return String.format("Носков с цветом '%s' и содержанием хлопка %d%% на складе нет.", request.getColor(), request.getCottonPart());
     }
 
